@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 08, 2018 at 12:17 PM
+-- Generation Time: Aug 08, 2018 at 12:37 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.1.1
 
@@ -28,6 +28,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `evidence` (
   `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `title` text NOT NULL,
   `about` text NOT NULL,
   `filename` text NOT NULL,
@@ -60,7 +61,8 @@ CREATE TABLE `users` (
 -- Indexes for table `evidence`
 --
 ALTER TABLE `evidence`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `users`
@@ -82,6 +84,16 @@ ALTER TABLE `evidence`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `evidence`
+--
+ALTER TABLE `evidence`
+  ADD CONSTRAINT `evidence_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
