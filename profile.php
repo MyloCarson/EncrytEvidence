@@ -133,17 +133,17 @@
 	        <h4 class="modal-title">Add New Evidence </h4><span class="glyphicons glyphicons-plus"></span>
 	      </div>
 	      <div class="modal-body">
-	      	<form enctype="multipart/form-data" method="post" action="profile.php">
+	      	<form enctype="multipart/form-data" method="POST" action="">
 	      		<div class="form-group">
 				  <label for="title">Title:</label>
-				  <input type="text" class="form-control" id="title" placeholder="Evidence One">
+				  <input type="text" name="title" class="form-control" id="title" placeholder="Evidence One">
 				</div>
 
 				<div class="form-group">
 				  <label for="title">About Evidence:</label>
-				  <textarea class="form-control" placeholder="Write something explanatory about the evidence"></textarea> 
+				  <textarea class="form-control" name="about" placeholder="Write something explanatory about the evidence"></textarea> 
 				</div>
-	
+
 	      		<input type="file" name="file" class="input-control" accept=".zip, .rar">
 	      		<!-- <span class="help-block">Only .zip and .rar files are allowed.</span> -->
 	      		<div class="alert alert-danger">
@@ -151,7 +151,7 @@
 	      			
 	      		</div>
 
-	      		<button type="submit"  name="submit" class="btn btn-primary">Upload</button>
+	      		<button type="submit"  name="upload" class="btn btn-primary">Upload</button>
 	      	</form>
 	      </div>
 	      <div class="modal-footer">
@@ -159,11 +159,60 @@
 	      </div>
 	    </div>
 
-	  </div>
+	  </div> 
 	</div>
 	<!-- End Of upload Modal-->
-			
+	<?php 	
+		if (isset($_POST['upload'])) {
+			$directory = "uploads/";
 
+			$evidence_title = $_POST['title'];
+			$about = $_POST['about'];
+			if (isset($_FILES['file'])) {
+				$filename = $_FILES['file']['name'];
+				$file_tmp = $_FILES['file']['tmp_name'];
+				move_uploaded_file($file_tmp,$directory.$filename);
+
+				$zip = new ZipArchive();
+
+				$zipFile = __DIR__ . '/output.zip';
+				if (file_exists($zipFile)) {
+				    unlink($zipFile);
+				}
+
+				$zipStatus = $zip->open($zipFile, ZipArchive::CREATE);
+				if ($zipStatus !== true) {
+				    throw new RuntimeException(sprintf('Failed to create zip archive. (Status code: %s)', $zipStatus));
+				}
+
+				$password = 'top-secret';
+				if (!$zip->setPassword($password)) {
+				    throw new RuntimeException('Set password failed');
+				}
+
+				// compress file
+				$fileName = __DIR__ ."/".$directory.$filename;
+				$baseName = basename($fileName);
+				if (!$zip->addFile($fileName, $baseName)) {
+				    throw new RuntimeException(sprintf('Add file failed: %s', $fileName));
+				}
+
+				// encrypt the file with AES-256
+				if (!$zip->setEncryptionName($baseName, ZipArchive::EM_AES_256)) {
+				     throw new RuntimeException(sprintf('Set encryption failed: %s', $baseName));
+				}
+
+				$zip->close();
+
+			
+				echo "<script type='text/JavaScript'>
+        
+                                 window.onload = function(){ alertify.alert('Evidence has been uploaded successfully');};
+                                 
+                                 </script>";
+			}
+		}
+	?>
 
 	<!-- GetKey Modal -->
 	<div id="keyModal" class="modal fade" role="dialog">
