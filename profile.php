@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<?php 
+ include 'connect.php';
+
+?>
 <html>
 <head>
 	<meta charset="utf-8" />
@@ -135,8 +139,8 @@
 	      <div class="modal-body">
 	      	<form enctype="multipart/form-data" method="POST" action="">
 	      		<div class="form-group">
-				  <label for="title">Title:</label>
-				  <input type="text" name="title" class="form-control" id="title" placeholder="Evidence One">
+				  <label for="title">Folder Name:</label>
+				  <input type="text" name="folder_name" class="form-control" id="title" placeholder="Evidence One" required="true">
 				</div>
 
 				<div class="form-group">
@@ -144,10 +148,10 @@
 				  <textarea class="form-control" name="about" placeholder="Write something explanatory about the evidence"></textarea> 
 				</div>
 
-	      		<input type="file" name="file" class="input-control" accept=".zip, .rar">
+	      		<input type="file" name="file[]" class="input-control" multiple required="true">
 	      		<!-- <span class="help-block">Only .zip and .rar files are allowed.</span> -->
 	      		<div class="alert alert-danger">
-	      			<strong>Note! only .zip and .rar is allowed.</strong>
+	      			<strong>Add all files for evidence</strong>
 	      			
 	      		</div>
 
@@ -162,54 +166,88 @@
 	  </div> 
 	</div>
 	<!-- End Of upload Modal-->
+	<?php
+		function randomPassword() {
+			$alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+			$pass = array(); //remember to declare $pass as an array
+			$alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+			for ($i = 0; $i < 8; $i++) {
+				$n = rand(0, $alphaLength);
+				$pass[] = $alphabet[$n];
+			}
+		return implode($pass); //turn the array into a string
+		}
+
+
+		?>
 	<?php 	
 		if (isset($_POST['upload'])) {
 			$directory = "uploads/";
 
-			$evidence_title = $_POST['title'];
+			$folder_name = $_POST['folder_name'];
 			$about = $_POST['about'];
+			$password = randomPassword();
+			$today = date("F j, Y, g:i a"); 
+			$path = "mylo"; 
+
+			$zip = new ZipArchive();
 			if (isset($_FILES['file'])) {
-				$filename = $_FILES['file']['name'];
-				$file_tmp = $_FILES['file']['tmp_name'];
-				move_uploaded_file($file_tmp,$directory.$filename);
+				$zipFile = __DIR__ . '/uploads/'.$folder_name.'.zip'; //Specify the zip file
 
-				$zip = new ZipArchive();
+			    $zipStatus = $zip->open($zipFile, ZipArchive::CREATE);
+			    
+			    //Check if the zipped file has been created...
 
-				$zipFile = __DIR__ . '/output.zip';
-				if (file_exists($zipFile)) {
-				    unlink($zipFile);
-				}
+			    if ($zipStatus !== true) {
+			        throw new RuntimeException(sprintf('Failed to create zip archive. (Status code: %s)', $zipStatus));
+			    }
 
-				$zipStatus = $zip->open($zipFile, ZipArchive::CREATE);
-				if ($zipStatus !== true) {
-				    throw new RuntimeException(sprintf('Failed to create zip archive. (Status code: %s)', $zipStatus));
-				}
+			    //Set the password of the folder
 
-				$password = 'top-secret';
-				if (!$zip->setPassword($password)) {
-				    throw new RuntimeException('Set password failed');
-				}
+			    if (!$zip->setPassword($password)) {
+			        throw new RuntimeException('Set password failed');
+			    }
 
-				// compress file
-				$fileName = __DIR__ ."/".$directory.$filename;
-				$baseName = basename($fileName);
-				if (!$zip->addFile($fileName, $baseName)) {
-				    throw new RuntimeException(sprintf('Add file failed: %s', $fileName));
-				}
+			    /**
+			     * Move the files to a temporary location
+			     * Add the files to the zip folder
+			     */
 
-				// encrypt the file with AES-256
-				if (!$zip->setEncryptionName($baseName, ZipArchive::EM_AES_256)) {
-				     throw new RuntimeException(sprintf('Set encryption failed: %s', $baseName));
-				}
+			    for($i=0; $i < count($_FILES['file']['name']); $i++)
+			    {   
+			        move_uploaded_file($_FILES['file']['tmp_name'][$i], __DIR__.'/tempLocation/'.''.$_FILES['file']['name'][$i]);
+			        $fileName = __DIR__.'/tempLocation/'.''.$_FILES['file']['name'][$i];
+			        $baseName = basename($fileName);
+			        if (!$zip->addFile($fileName, $baseName)) {
+			            throw new RuntimeException(sprintf('Add file failed: %s', $fileName));
+			        }
+			        // if (!$zip->setEncryptionName($baseName, ZipArchive::EM_AES_256)) {
+			        //     throw new RuntimeException(sprintf('Set encryption failed: %s', $baseName));
+			        // }
+			    }
 
-				$zip->close();
+		
 
-			
-				echo "<script type='text/JavaScript'>
+			    $sql = "INSERT INTO `evidence` (`user_id`,`title`,`about`,`filename`,`path`,`evidence_key`,`date_created`) VALUES ((select id from users where username = 'mylo'),'$folder_name','$about','$folder_name','$zipFile','$password','$today')";
+			    // var_dump($sql);
+			    $res = $conn->query($sql);
+			    if ($res ==true) {
+			    	echo "<script type='text/JavaScript'>
         
                                  window.onload = function(){ alertify.alert('Evidence has been uploaded successfully');};
                                  
                                  </script>";
+			    }
+			    else{
+			    	echo "<script type='text/JavaScript'>
+        
+                                 window.onload = function(){ alertify.alert('Failed');};
+                                 
+                                 </script>";
+			    }
+
+			
+				
 			}
 		}
 	?>
