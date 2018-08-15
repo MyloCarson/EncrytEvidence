@@ -55,9 +55,46 @@
 			<div class="col-md-8">
 				<button class="btn btn-primary" data-toggle="modal" data-target="#newEvidenceModal">Upload New Evidence</button>
 
-				<center><h1>No Evidence Uploaded</h1></center>
 
-				<div class="panel panel-default">
+
+				<?php
+					$sql = "SELECT * FROM `evidence` where `user_id` = '1'";
+					$result = $conn->query($sql);
+					if ($result->num_rows > 0 ) {
+						$i=1;
+                        while($row=$result->fetch_assoc()) {
+                        	$password = '"'.$row["evidence_key"].'"';
+
+                        	$output = "
+                        				<div class='panel panel-default'>
+							  <div class='panel-heading'>#".$i."    ".$row["filename"]."</div>
+							  <div class='panel-body'>Panel Content
+								<div class='row'>
+									<div class='col-md-10'>
+										<h6>Filename : filename.zip</h6>
+										<h6>Date Added : 10th August 2018</h6>
+
+										<h6>Time Added : 10:00am</h6>
+
+									</div>
+									<div class='col-md-2'>
+										<button class='btn btn-primary'>Send</button>
+										<button class='btn btn-primary'>Delete</button>
+										<button class='btn btn-primary' data-toggle='modal' data-target='#keyModal' onclick='getMoreKey(".$password.")'>Get Key</button>
+									</div>
+								</div>
+							  </div>
+							</div>";
+							$i++;
+							echo $output;
+                        }
+					}else{
+						echo "<center><h1>No Evidence Uploaded</h1></center>";
+					}
+				?>
+
+
+				<!-- <div class="panel panel-default">
 				  <div class="panel-heading">First File Uploaded</div>
 				  <div class="panel-body">Panel Content
 					<div class="row">
@@ -118,7 +155,7 @@
 					</div>
 
 				  </div>
-				</div>
+				</div> -->
 
 			</div>
 		</div>
@@ -263,7 +300,7 @@
 	        <h4 class="modal-title">Key for File Uploaded</h4>
 	      </div>
 	      <div class="modal-body">
-	        <div class="well">X673HSBH!682YHSH</div>
+	        <div class="well" id="passkey">X673HSBH!682YHSH</div>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -273,6 +310,19 @@
 	  </div>
 	</div>
 	<!-- end of key modal-->
+	<script type="text/javascript">
 
+	// $(window).load(function(){  function getMoreKey(){}   });
+
+	$(document).ready(function() {
+		 getMoreKey = function(key){
+		 	console.log(key);
+		 	$('#passkey').text(key);
+
+		};
+   		
+ });
+	
+</script>
 </body>
 </html>
