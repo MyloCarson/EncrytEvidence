@@ -25,7 +25,9 @@ require 'connect.php';
     
     function signup($username,$email,$fullname,$password,$confirm_password)
 {
+   
     global $conn;
+    echo 'i dey!';
     $query="SELECT * FROM `users` WHERE Email ='$email'";
     $result=mysqli_query($conn,$query);
     if(mysqli_num_rows($result)>0){
@@ -46,5 +48,5 @@ require 'connect.php';
      }   
             
      else echo 'Signup failed, check email and ensure passwords match'; 
-}git 
+}
 ?>

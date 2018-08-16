@@ -1,11 +1,13 @@
 <?php
 require 'connect.php';
 require 'functions.php';
-if(isset($_POST['signup']))
+if(isset($_POST['register']))
  {
     $username=mysqli_real_escape_string($conn,($_POST['username']));
     $email=mysqli_real_escape_string($conn,($_POST['email']));
-    $fullname=mysqli_real_escape_string($conn,($_POST['fullname']));
+    $fullname=mysqli_real_escape_string($conn,($_POST['fullName']));
+    $password=$_POST['password'];
+    $confirm_password=$_POST['confirm-password'];
     signup($username,$email,$fullname,$password,$confirm_password);
 }
 ?>
