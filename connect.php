@@ -1,13 +1,13 @@
 <?php
+
 	$user = 'root';
 	$pass = '';
 	$db = 'encrypt_web';
-
-	$conn = new mysqli('localhost', $user, $pass, $db) or die("unable to connect");
+	$conn =  mysqli_connect('localhost', $user, $pass,$db) or die("unable to connect");
 	//check connection
-	echo 'hey';
-	if ($conn->connect_errno) {
-    printf("Connect failed: %s\n", $conn->connect_error);
+
+	if (!$conn) {
+    printf("Connect failed: %s\n", mysqli_connect_error());
     exit();
 }
 ?>

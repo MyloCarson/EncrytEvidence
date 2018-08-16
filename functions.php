@@ -1,11 +1,14 @@
  <?php
-
+require 'connect.php';
  function checks($email,$password,$confirm_password){
     if(!filter_var($email,FILTER_VALIDATE_EMAIL)||$password!=$confirm_password)
-        return false;
-        else return true;
+      
+        return false; 
+        else 
+       return true;
     }
 
+    
     function validationCode()
     {
         $validation_code = md5(rand(0,1000));
@@ -13,33 +16,38 @@
 
     }
     function passwordEncode($password){
-        if(isset($_POST['password'])){
-            $password=$_POST['password'];
-            $hashfunction="$2y$10$";
+        $hashfunction="$2y$10$";
         $salt="iamencodeddecodeifyoucan";
         $hashf_salt=$hashfunction.$salt;
         $password=crypt($password,$hashf_salt);
         return $password;
         }
-    }
+    
     function signup($username,$email,$fullname,$password,$confirm_password)
 {
-    if(checks($email,$password,$confirm_password)==true)
+    global $conn;
+    $query="SELECT * FROM `users` WHERE Email ='$email'";
+    $result=mysqli_query($conn,$query);
+    if(mysqli_num_rows($result)>0){
+       echo 'User with Email '.$email.' already exists';
+    }
+    elseif(checks($email,$password,$confirm_password))
     {
         $password=passwordEncode($password);
         $verification_code=validationCode();
-        $query="INSERT INTO users (username,fullname,email,password,verification_code,date_created)
-        VALUES($username,$fullname,$email,$password,$verification_code,date('Y-m-d'))";
-        $execute=mysqli_query($conn,$query);
-        if($execute)
+        $query="INSERT INTO users (username,fullname,email,password,verification_code)
+        VALUES('$username','$fullname','$email','$password','$verification_code')";
+        if(mysqli_query($conn,$query))
         {
             echo 'Signup successful';
-        mail($email.'Validation Code','Thank you for signing up, your verification code is'.$verification_code);
-        }      
-             else 'Signup unsucccessful';
-    }
+        ///mail($email.'Validation Code','Thank you for signing up, your verification code is'.$verification_code);
+        }  
+     }   
             
+        
 }
+//checks('siracubegmail.com','AAA','AAA');
     
-
+signup('Abraham','abraham2@gmail.com','Abraham Ajiboye','abraham16','abraham106');
+//echo passwordEncode('ABBRAHAM');
 ?>
