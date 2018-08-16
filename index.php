@@ -1,3 +1,15 @@
+<?php
+require 'connect.php';
+require 'functions.php';
+if(isset($_POST['signup']))
+ {
+    $username=mysqli_real_escape_string($conn,($_POST['username']));
+    $email=mysqli_real_escape_string($conn,($_POST['email']));
+    $fullname=mysqli_real_escape_string($conn,($_POST['fullname']));
+    signup($username,$email,$fullname,$password,$confirm_password);
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -36,7 +48,7 @@
     </div>
     <div class="col-md-4"></div>
     <div class="col-md-4">
-        <form>
+        <form method='POST' action="index.php">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                 <input id="username" type="text" class="form-control" name="username" placeholder="Username">
@@ -47,7 +59,7 @@
                 <input id="password" type="text" class="form-control" name="password" placeholder="password">
                 
             </div>
-            <button class="btn btn-primary col-md-12">Login</button>
+            <button class="btn btn-primary col-md-12" name='login' >Login</button>
             
         </form>
         <div>
@@ -72,7 +84,7 @@
       <div class="modal-body">
         <div>
 
-            <form>
+            <form action='index.php' method='POST'>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                     <input id="username" type="text" class="form-control" name="username" placeholder="Username" required="true">
@@ -93,7 +105,7 @@
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
                     <input id="confirm-password" type="text" class="form-control" name="confirm-password" placeholder="password" required="true">
                 </div>
-                <button class="btn btn-primary">Create Account</button>
+                <button class="btn btn-primary" name='register'>Create Account</button>
             </form>
             
         </div>
