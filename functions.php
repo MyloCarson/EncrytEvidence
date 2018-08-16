@@ -42,12 +42,9 @@ require 'connect.php';
             echo 'Signup successful';
         ///mail($email.'Validation Code','Thank you for signing up, your verification code is'.$verification_code);
         }  
+        
      }   
             
-        
-}
-//checks('siracubegmail.com','AAA','AAA');
-    
-signup('Abraham','abraham2@gmail.com','Abraham Ajiboye','abraham16','abraham106');
-//echo passwordEncode('ABBRAHAM');
+     else echo 'Signup failed, check email and ensure passwords match'; 
+}git 
 ?>
