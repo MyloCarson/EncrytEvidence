@@ -1,4 +1,5 @@
  <?php
+session_start();
 require 'connect.php';
  function checks($email,$password,$confirm_password){
     if(!filter_var($email,FILTER_VALIDATE_EMAIL)||$password!=$confirm_password)
@@ -27,7 +28,6 @@ require 'connect.php';
 {
    
     global $conn;
-    echo 'i dey!';
     $query="SELECT * FROM `users` WHERE Email ='$email'";
     $result=mysqli_query($conn,$query);
     if(mysqli_num_rows($result)>0){
@@ -37,16 +37,47 @@ require 'connect.php';
     {
         $password=passwordEncode($password);
         $verification_code=validationCode();
-        $query="INSERT INTO users (username,fullname,email,password,verification_code)
-        VALUES('$username','$fullname','$email','$password','$verification_code')";
+        $query="INSERT INTO users (username,fullname,email,password,verification_code,date_created)
+        VALUES('$username','$fullname','$email','$password','$verification_code',now())";
         if(mysqli_query($conn,$query))
         {
             echo 'Signup successful';
-        ///mail($email.'Validation Code','Thank you for signing up, your verification code is'.$verification_code);
+            $_SESSION['active']=0;
+            $_SESSION['logged-in']=True;
+            $message="
+            Confirmation link has been sent to $email, 
+            please verify your account by clicking on the link in the message";
+            $to = $email;
+            $subject = 'Account Verification (Evidence)';
+            $message_body = "Hello $username, 
+            Thanks for signing up!
+            Please Click this link to activate your account:
+            http://localhost/Evidence/Evidence/profile.php?email=$email, &verification_code = $verification_code";
+            echo $message;
+            mail($to, $subject,$message_body);
         }  
         
      }   
             
      else echo 'Signup failed, check email and ensure passwords match'; 
+}
+function login($email,$password){
+    $password=passwordEncode($password);
+    global $conn;
+    $query="SELECT * FROM `users` WHERE Email ='$email'";
+    $result=mysqli_query($conn,$query);
+    if(mysqli_num_rows($result)==0){
+       echo 'User with Email '.$email.' do not exist';
+    }
+else{
+    $user=mysqli_fetch_assoc($result);
+    if($password==$user['password']){
+        echo 'login success';
+        header("location:profile.php");
+    }
+    else 
+    echo 'Invalid password';
+}
+
 }
 ?>

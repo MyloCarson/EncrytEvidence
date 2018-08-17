@@ -10,6 +10,11 @@ if(isset($_POST['register']))
     $confirm_password=$_POST['confirm-password'];
     signup($username,$email,$fullname,$password,$confirm_password);
 }
+elseif(isset($_POST['login'])){
+    $email=mysqli_real_escape_string($conn,($_POST['email']));
+    $password=mysqli_real_escape_string($conn,($_POST['password']));
+    login($email,$password);
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +58,7 @@ if(isset($_POST['register']))
         <form method='POST' action="index.php">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                <input id="username" type="text" class="form-control" name="username" placeholder="Username">
+                <input id="username" type="email" class="form-control" name="email" placeholder="Email">
                 
             </div>
             <div class="input-group">
@@ -101,11 +106,11 @@ if(isset($_POST['register']))
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input id="password" type="text" class="form-control" name="password" placeholder="password" required="true">
+                    <input id="password" type="password" class="form-control" name="password" placeholder="password" required="true">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input id="confirm-password" type="text" class="form-control" name="confirm-password" placeholder="password" required="true">
+                    <input id="confirm-password" type="password" class="form-control" name="confirm-password" placeholder="password" required="true">
                 </div>
                 <button class="btn btn-primary" name='register'>Create Account</button>
             </form>
