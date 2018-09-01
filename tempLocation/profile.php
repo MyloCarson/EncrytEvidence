@@ -1,12 +1,3 @@
-<?php
-	session_start();
-
-	if (!isset($_SESSION["user_id"])) {
-		header("location:index.php");
-	}else{
-		$userID = $_SESSION["user_id"];
-	}
-?>
 <!DOCTYPE html>
 <?php 
  include 'api/connect.php';
@@ -53,10 +44,10 @@
 			<div class="col-md-3">
 				<center><img src="img/usericon.png" class="img-rounded" height="100" /></center>
 				<div>
-					<center><h3><?php echo $_SESSION["username"]; ?></h3></center>
-					<center><button class="btn btn-primary"><a href="logout.php" style="color: white;text-decoration: none;">Log Out</a></button></center>
+					<center><h3>i_am_mylo</h3></center>
+					<center><button class="btn btn-primary">Log Out</button></center>
 
-					<center><button class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit Account</button></center>
+					<center><button class="btn btn-primary">Edit Account</button></center>
 					<center><button class="btn btn-primary">Delete Account</button></center>
 					<center><button class=" btn btn-primary">Reset Password</button></center>
 				</div>
@@ -67,11 +58,9 @@
 
 
 				<?php
-
-					$sql = "SELECT * FROM `evidence` where `user_id` = $userID";
-					
-					if ($result = $conn->query($sql)) {
-						if ($result->num_rows > 0 ) {
+					$sql = "SELECT * FROM `evidence` where `user_id` = '1'";
+					$result = $conn->query($sql);
+					if ($result->num_rows > 0 ) {
 						$i=1;
                         while($row=$result->fetch_assoc()) {
                         	$password = '"'.$row["evidence_key"].'"';
@@ -79,13 +68,13 @@
                         	$output = "
                         				<div class='panel panel-default'>
 							  <div class='panel-heading'>#".$i."    ".$row["filename"]."</div>
-							  <div class='panel-body'>Evidence Details
+							  <div class='panel-body'>Panel Content
 								<div class='row'>
 									<div class='col-md-10'>
-										<h6>Filename : ".$row["filename"].".zip</h6>
-										<h6>Date Added : ".date("m-d-Y", strtotime($row["date_created"]))."</h6>
+										<h6>Filename : filename.zip</h6>
+										<h6>Date Added : 10th August 2018</h6>
 
-										<h6>Time Added : ".date("h:i  A", strtotime($row["date_created"]))."</h6>
+										<h6>Time Added : 10:00am</h6>
 
 									</div>
 									<div class='col-md-2'>
@@ -98,16 +87,10 @@
 							</div>";
 							$i++;
 							echo $output;
-	                        }
-						}else{
-							echo "<center><h1>No Evidence Uploaded</h1></center>";
-						}
-
+                        }
 					}else{
 						echo "<center><h1>No Evidence Uploaded</h1></center>";
-
 					}
-
 				?>
 
 
@@ -275,22 +258,20 @@
 			        if (!$zip->addFile($fileName, $baseName)) {
 			            throw new RuntimeException(sprintf('Add file failed: %s', $fileName));
 			        }
-			        if (!$zip->setEncryptionName($baseName, ZipArchive::EM_AES_256)) {
-			            throw new RuntimeException(sprintf('Set encryption failed: %s', $baseName));
-			        }
+			        // if (!$zip->setEncryptionName($baseName, ZipArchive::EM_AES_256)) {
+			        //     throw new RuntimeException(sprintf('Set encryption failed: %s', $baseName));
+			        // }
 			    }
 
 		
 
-			    $sql = "INSERT INTO `evidence` (`user_id`,`title`,`about`,`filename`,`path`,`evidence_key`,`date_created`) VALUES ((select id from users where id = $userID),'$folder_name','$about','$folder_name','$zipFile','$password','$today')";
+			    $sql = "INSERT INTO `evidence` (`user_id`,`title`,`about`,`filename`,`path`,`evidence_key`,`date_created`) VALUES ((select id from users where username = 'mylo'),'$folder_name','$about','$folder_name','$zipFile','$password','$today')";
 			    // var_dump($sql);
 			    $res = $conn->query($sql);
 			    if ($res ==true) {
 			    	echo "<script type='text/JavaScript'>
         
-                                 window.onload = function(){ alertify.alert('Evidence has been uploaded successfully');
-                                 	location.reload();
-                             };
+                                 window.onload = function(){ alertify.alert('Evidence has been uploaded successfully');};
                                  
                                  </script>";
 			    }
@@ -391,39 +372,6 @@
 	  </div>
 	</div>
 	<!-- end of send Modal-->
-	
-	<!--begin of edit account modal -->
-	
-	<div id="editModal" class="modal fade" role="dialog">
-	  <div class="modal-dialog">
-
-	    <!-- Modal content-->
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Edit Account</h4>
-	      </div>
-	      <div class="modal-body">
-	        	<div class="form-group">
-				  <label for="title">Full Name</label>
-				  <input type="text" name="name" class="form-control" placeholder="John Doe" required="true" id="name" value="<?php echo $_SESSION["fullname"]; ?>">
-				</div>
-
-				<div class="form-group">
-				  <label for="title">Username</label>
-				  <input type="email" name="username" class="form-control" placeholder="user5000" required="true" id="username" value="<?php echo $_SESSION["username"]; ?>">
-				</div>
-
-				<button class="btn btn-default" type="submit" name="send" onclick="updateAccount()">Send</button>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	      </div>
-	    </div>
-		<input id="getMe" type="text" value="<?php echo $_SESSION["user_id"]; ?>" style="display: none;">
-	  </div>
-	</div>
-	<!-- end of edit account Modal-->
 
 	<script type="text/javascript">
 
@@ -503,28 +451,27 @@
               url: "api/api.php",
               data:{
                 action:"email",
-                evidenceID : sendID,
+                evidenceID : id,
                 sender : sender,
                 recipient : recipient_mail,
                 message : senderMessage
               },
               success:function (data) {
-                 console.log("success mail: "+ data);
+                  console.log("success mail: "+ data);
                  let obj = JSON.parse(data);
-                 console.log(obj);
                  console.log(obj.error);
                  console.log(obj.message);
                  if (obj.error == 0) {
                  	alertify
 						  .alert(obj.message, function(){
-						   alertify.message('OK');
-						   location.reload();
+						    alertify.message('OK');
+						    location.reload();
 						  });
                  	
                  }else{
                  	alertify
 						  .alert(data, function(){
-						   alertify.message('OK');
+						    alertify.message('OK');
 						  });
                  }
               },
@@ -534,57 +481,6 @@
             });
 		};
 
-		updateAccount = function(){
-			let name = $("#name").val();
-			let username = $("#username").val();
-			let id = $("#getMe").val();
-
-
-			data = {
-                action:"update",
-                user_id : id,
-                name : name,
-                username : username
-              }
-             console.log(data);
-
-
-			$.ajax({
-              type:"POST",
-              url: "api/api.php",
-              data:{
-                action:"update",
-                user_id : id,
-                name : name,
-                username : username
-              },
-              success:function (data) {
-                 console.log("success mail: "+ data);
-                 let obj = JSON.parse(data);
-                 console.log(obj);
-                 console.log(obj.error);
-                 console.log(obj.message);
-                 if (obj.error == 0) {
-                 	alertify
-						  .alert(obj.message, function(){
-						   alertify.message('OK');
-						   location.reload();
-						  });
-                 	
-                 }else{
-                 	alertify
-						  .alert(obj.message, function(){
-						   alertify.message('OK');
-						  });
-                 }
-              },
-              error:function () {
-                alert("Error");
-              }
-            });
-
-
-		};
 
    		
  });

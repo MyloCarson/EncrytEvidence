@@ -1,30 +1,3 @@
-<?php
-session_start();
-if (isset($_SESSION["user_id"])) {
-    header("location:profile.php");
-}
-require 'api/connect.php';
-require 'functions.php';
-
-
-if(isset($_POST['register']))
- {
-    $username=mysqli_real_escape_string($conn,($_POST['username']));
-    $email=mysqli_real_escape_string($conn,($_POST['email']));
-    $fullname=mysqli_real_escape_string($conn,($_POST['fullName']));
-    $password=$_POST['password'];
-    $confirm_password=$_POST['confirm-password'];
-    signup($username,$email,$fullname,$password,$confirm_password);
-}
-elseif(isset($_POST['login'])){
-    $email=mysqli_real_escape_string($conn,($_POST['email']));
-    $password=mysqli_real_escape_string($conn,($_POST['password']));
-    login($email,$password);
-}
-
-
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -63,18 +36,18 @@ elseif(isset($_POST['login'])){
     </div>
     <div class="col-md-4"></div>
     <div class="col-md-4">
-        <form method='POST' action="index.php">
+        <form>
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                <input id="username" type="email" class="form-control" name="email" placeholder="Email">
+                <input id="username" type="text" class="form-control" name="username" placeholder="Username">
                 
             </div>
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                <input id="password" type="password" class="form-control" name="password" placeholder="password">
+                <input id="password" type="text" class="form-control" name="password" placeholder="password">
                 
             </div>
-            <button class="btn btn-primary col-md-12" name='login' >Login</button>
+            <button class="btn btn-primary col-md-12">Login</button>
             
         </form>
         <div>
@@ -99,7 +72,7 @@ elseif(isset($_POST['login'])){
       <div class="modal-body">
         <div>
 
-            <form action='index.php' method='POST'>
+            <form>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                     <input id="username" type="text" class="form-control" name="username" placeholder="Username" required="true">
@@ -114,13 +87,13 @@ elseif(isset($_POST['login'])){
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input id="password" type="password" class="form-control" name="password" placeholder="password" required="true">
+                    <input id="password" type="text" class="form-control" name="password" placeholder="password" required="true">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input id="confirm-password" type="password" class="form-control" name="confirm-password" placeholder="password" required="true">
+                    <input id="confirm-password" type="text" class="form-control" name="confirm-password" placeholder="password" required="true">
                 </div>
-                <button class="btn btn-primary" name='register'>Create Account</button>
+                <button class="btn btn-primary">Create Account</button>
             </form>
             
         </div>
