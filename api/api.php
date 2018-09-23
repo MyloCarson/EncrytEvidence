@@ -4,13 +4,6 @@ include 'connect.php';
 
 require '../vendor/autoload.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require 'phpmailer/phpmailer/src/Exception.php';
-require 'phpmailer/phpmailer/src/PHPMailer.php';
-require 'phpmailer/phpmailer/src/SMTP.php';
-// &message=gsjhaasjsjksa&sender=shjsdjds%20sjsdjkds&recipient=akannidavidseun@gmail.com
 	
 	function deleteEvidence($id){
 		global $conn;
@@ -38,40 +31,52 @@ require 'phpmailer/phpmailer/src/SMTP.php';
 		$subject = "Evidence";
 		$msg;
 
-		$mail = new PHPMailer(true);   
-		try {
+		$sql =  "SELECT * FROM evidence WHERE id = $id";
+
+		if ($res = $conn->query($sql)) {
+			
+			$mail = new PHPMailer;
+			while($row=$res->fetch_assoc()) {
+				try {
 		    
-			//Recipients
-			$mail->setFrom($sender, 'Mailer');
-		    $mail->addAddress($recipient, 'User');     // Add a recipient
-		    // $mail->addAddress('akannidavidseun@gmail.com');               // Name is optional
-		    $mail->addReplyTo('info@example.com', 'Information');
-		    // $mail->addCC('cc@example.com');
-		    // $mail->addBCC('bcc@example.com');
-		    $mail->Subject = 'Encrypted Zipped Evidence From EncryptWeb';
-    		$mail->Body    = $message;
-    		$mail->addAttachment('../uploads/Gbogbo.zip');   
-    		$mail->SMTPDebug = false;
-            $mail->do_debug = 0;
+					//Recipients
+					$mail->setFrom($sender, 'Sender');
+				    $mail->addAddress($recipient, 'User');     // Add a recipient
+				    // $mail->addAddress('akannidavidseun@gmail.com');               // Name is optional
+				    $mail->addReplyTo('info@example.com', 'Information');
+				    // $mail->addCC('cc@example.com');
+				    // $mail->addBCC('bcc@example.com');
+				    $mail->Subject = 'Encrypted Zipped Evidence From EncryptWeb';
+		    		$mail->Body    = $message."\n Here is the password ". $row['evidence_key'];
+		    		$mail->addAttachment('../uploads/'.$row['filename'].'.zip');   
+		    		$mail->SMTPDebug = false;
+		            $mail->do_debug = 0;
 
 
-		    ob_start(); //start output buffering to capture all output and prevent errors from being displayed
-            $delivery = $mail->Send();
-            ob_end_clean(); //erase the buffer and stop output buffering
-		    $msg = array('error' => 0,'message' => 'Mail sent Successfully');
-			echo json_encode($msg);
+				    ob_start(); //start output buffering to capture all output and prevent errors from being displayed
+		            $delivery = $mail->Send();
+		            ob_end_clean(); //erase the buffer and stop output buffering
+				    $msg = array('error' => 0,'message' => 'Mail sent Successfully','sender'=>$sender, 'recepient_mail'=>$recipient);
+					echo json_encode($msg);
 
-			// $res = mail($recipient,$subject,$message);
-			// if ($res != False) {
-				
-			// }else{
-			// 	$msg = array('error' => 1,'message' => 'Mail not sent');
-			// 	echo json_encode($msg);
-			// }
-		} catch (Exception $e) {
-			    echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+					// $res = mail($recipient,$subject,$message);
+					// if ($res != False) {
+						
+					// }else{
+					// 	$msg = array('error' => 1,'message' => 'Mail not sent');
+					// 	echo json_encode($msg);
+					// }
+				} catch (Exception $e) {
+					    echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
 
+					}
+			}   
+		
 		}
+
+
+
+		
 
 	};
 

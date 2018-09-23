@@ -280,7 +280,7 @@
 			        }
 			    }
 
-		
+		// location.reload();
 
 			    $sql = "INSERT INTO `evidence` (`user_id`,`title`,`about`,`filename`,`path`,`evidence_key`,`date_created`) VALUES ((select id from users where id = $userID),'$folder_name','$about','$folder_name','$zipFile','$password','$today')";
 			    // var_dump($sql);
@@ -289,7 +289,8 @@
 			    	echo "<script type='text/JavaScript'>
         
                                  window.onload = function(){ alertify.alert('Evidence has been uploaded successfully');
-                                 	location.reload();
+                                 	
+                                 	window.location.href='https://testthesms.000webhostapp.com/encryptweb/profile.php';
                              };
                                  
                                  </script>";
@@ -368,13 +369,13 @@
 	      </div>
 	      <div class="modal-body">
 	        	<div class="form-group">
-				  <label for="title">Sender's Name / E-Mail:</label>
-				  <input type="text" name="name" class="form-control" placeholder="John Doe / someone@example.com" required="true" id="senderName">
+				  <label for="title">Sender's E-Mail:</label>
+				  <input type="email" name="name" class="form-control" placeholder="sender@example.com" required="true" id="senderName">
 				</div>
 
 				<div class="form-group">
 				  <label for="title">Recipient's Email:</label>
-				  <input type="email" name="recepient_mail" class="form-control" placeholder="someone@example.com" required="true" id="recipient_mail">
+				  <input type="email" name="recepient_mail" class="form-control" placeholder="recipient@example.com" required="true" id="recipient_mail">
 				</div>
 
 				<div class="form-group">
